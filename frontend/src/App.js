@@ -7,12 +7,19 @@ function App() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
 
+  // Lấy dữ liệu user từ backend
   const fetchUsers = async () => {
-    const res = await axios.get('http://localhost:3000/users');
-    setUsers(res.data);
+    try {
+      const res = await axios.get('http://localhost:3000/users');
+      setUsers(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div>
