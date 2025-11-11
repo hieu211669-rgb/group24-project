@@ -1,11 +1,11 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import UserList from './components/UserList';
 import AddUser from './components/AddUser';
+import UserList from './components/UserList';
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
 
   const fetchUsers = async () => {
     const res = await axios.get('http://localhost:3000/users');
@@ -16,8 +16,16 @@ function App() {
 
   return (
     <div>
-      <AddUser refreshUsers={fetchUsers} />
-      <UserList users={users} />
+      <AddUser
+        refreshUsers={fetchUsers}
+        editingUser={editingUser}
+        setEditingUser={setEditingUser}
+      />
+      <UserList
+        users={users}
+        refreshUsers={fetchUsers}
+        setEditingUser={setEditingUser}
+      />
     </div>
   );
 }

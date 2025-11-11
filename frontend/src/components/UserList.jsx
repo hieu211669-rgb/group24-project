@@ -11,6 +11,11 @@ export default function UserList() {
       .catch(err => console.error(err));
   }, []);
 
+const handleDelete = async (id) => {
+await axios.delete(`http://localhost:3000/users/${id}`);
+setUsers(users.filter(user => user.id !== id));
+};
+
   return (
     <div>
       <h2>Danh sách User</h2>
@@ -19,6 +24,8 @@ export default function UserList() {
           <li key={u.id}>{u.name} - {u.email}</li>
         ))}
       </ul>
+        <button onClick={() => handleEdit(user)}>Sửa</button>
+        <button onClick={() => handleDelete(user.id)}>Xóa</button>
     </div>
   );
 }
