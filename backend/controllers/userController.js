@@ -44,6 +44,12 @@ exports.deleteUser = async (req, res) => {
   }
   await User.findByIdAndDelete(userId);
   res.json({ msg: 'User deleted successfully' });
+ userId = req.params.id;
+    if (req.user.role !== 'admin' && req.user.id !== userId) {
+    return res.status(403).json({ msg: 'Access denied' });
+    }
+    await User.findByIdAndDelete(userId);
+    res.json({ msg: 'User deleted successfully' });
   } catch (err) {
   res.status(500).json({ msg: err.message });
 }

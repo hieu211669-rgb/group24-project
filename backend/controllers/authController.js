@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const sendEmail = require('../utils/email');
 
 // Đăng ký
 exports.signup = async (req, res) => {
@@ -54,4 +54,32 @@ try {
 // Đăng xuất (phía client sẽ xóa token)
 exports.logout = (req, res) => {
     res.json({ msg: 'Logged out successfully (client should remove token)' });
+res.json({ msg: 'Logged out successfully (client should remove token)' });
+};
+
+// Gửi email reset password
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+        const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    await sendEmail(user.email, 'Reset Password', `Click to reset: ${resetUrl}`);
+    res.json({ msg: 'Reset email sent' });
+};
+
+// Reset password với token
+exports.resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const hashed = await bcrypt.hash(password, 10);
+        await User.findByIdAndUpdate(decoded.id, { password: hashed });
+        res.json({ msg: 'Password reset successfully' });
+    } catch (err) {
+    res.status(400).json({ msg: 'Invalid or expired token' });
+    }
 };
