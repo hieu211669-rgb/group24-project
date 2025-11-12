@@ -15,6 +15,7 @@ mongoose.connect(`${process.env.MONGO_URI}`)
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log('Mongo Error:', err));
 
+app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/users', userRoutes);

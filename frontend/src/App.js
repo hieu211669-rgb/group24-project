@@ -1,18 +1,42 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import AuthForm from './components/AuthForm';
+// src/App.js
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import Login from './components/Login';
+import SignUp from './components/Signup';
 import Profile from './components/Profile';
-import AdminUserList from './components/AdminUserList';
+import UserList from './components/UserList';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
-export default function App() {
+function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  // 🔹 Hàm đăng xuất dùng chung cho cả admin và user
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    window.location.href = '/'; // quay lại trang Login
+  };
+
+  useEffect(() => {
+    setToken(localStorage.getItem('token'));
+  }, []);
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthForm />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/admin" element={<AdminUserList />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        
+        {/* 🔹 Truyền token & onLogout vào các trang có xác thực */}
+        <Route path="/profile" element={<Profile token={token} onLogout={handleLogout} />} />
+        <Route path="/admin" element={<UserList token={token} onLogout={handleLogout} />} />
+        
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );
 }
-  
+
+export default App;
