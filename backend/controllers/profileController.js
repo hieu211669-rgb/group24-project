@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const cloudinary = require('cloudinary').v2;
 
 // Lấy thông tin cá nhân
 exports.getProfile = async (req, res) => {
@@ -14,27 +13,18 @@ try {
 };
 
 exports.uploadAvatar = async (req, res) => {
-    try {
-        if (!req.files || !req.files.avatar) return res.status(400).json({ msg: 'No file uploaded' });
+  try {
+    if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
 
+    // Lưu link file vào DB (chỉ đường dẫn local)
+    const avatarPath = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    await User.findByIdAndUpdate(req.user.id, { avatar: avatarPath });
 
-            const result = await cloudinary.uploader.upload(req.files.avatar.tempFilePath, {
-            folder: 'avatars',
-        });
-
-
-        const updatedUser = await User.findByIdAndUpdate(req.user.id, { avatar: result.secure_url }, { new: true });
-        res.json({ msg: 'Avatar uploaded successfully', avatar: updatedUser.avatar });
-    } catch (err) {
+    res.json({ msg: 'Avatar uploaded successfully', avatar: avatarPath });
+  } catch (err) {
     res.status(500).json({ msg: err.message });
-    }
+  }
 };
-
-cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
-});
 
 // Cập nhật thông tin cá nhân
 exports.updateProfile = async (req, res) => {
