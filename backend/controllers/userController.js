@@ -2,8 +2,12 @@ const User = require('../models/User');
 
 // Lấy danh sách user
 exports.getUsers = async (req, res) => {
-  const users = await User.find();
+  try {
+  const users = await User.find().select('-password');
   res.json(users);
+  } catch (err) {
+  res.status(500).json({ msg: err.message });
+}
 };
 
 // Tạo user mới
@@ -33,12 +37,14 @@ exports.updateUser = async (req, res) => {
 
 // Xóa user (DELETE)
 exports.deleteUser = async (req, res) => {
-  const { id } = req.params;
   try {
-    const deleted = await User.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'User deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  const userId = req.params.id;
+  if (req.user.role !== 'admin' && req.user.id !== userId) {
+  return res.status(403).json({ msg: 'Access denied' });
   }
+  await User.findByIdAndDelete(userId);
+  res.json({ msg: 'User deleted successfully' });
+  } catch (err) {
+  res.status(500).json({ msg: err.message });
+}
 };
