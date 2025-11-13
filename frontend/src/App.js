@@ -7,6 +7,7 @@ import Profile from './components/Profile';
 import UserList from './components/UserList';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import AdminLogs from './components/AdminLogs';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -27,6 +28,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
         
         {/* 🔹 Truyền token & onLogout vào các trang có xác thực */}
         <Route path="/profile" element={<Profile token={token} onLogout={handleLogout} />} />
@@ -34,6 +36,7 @@ function App() {
         
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/log" element={<AdminLogs />} />
       </Routes>
     </Router>
   );
