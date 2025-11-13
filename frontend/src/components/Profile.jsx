@@ -1,4 +1,3 @@
-// src/components/Profile.jsx
 import { useState, useEffect } from 'react';
 import API from '../api';
 
@@ -8,7 +7,6 @@ export default function Profile({ token, onLogout }) {
   const [password, setPassword] = useState('');
   const defaultAvatar = 'https://via.placeholder.com/100';
 
-  // Lấy thông tin user khi component mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -24,50 +22,27 @@ export default function Profile({ token, onLogout }) {
     fetchProfile();
   }, [token]);
 
-  // Upload avatar
+  // Upload avatar lên Cloudinary
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const formData = new FormData();
     formData.append('avatar', file);
 
     try {
       const res = await API.post('/profile/upload-avatar', formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
       });
-      // Cập nhật avatar ngay lập tức
+      // Cập nhật avatar ngay lập tức trên UI
       setUserData(prev => ({ ...prev, avatar: res.data.avatar }));
       alert('Avatar updated!');
     } catch (err) {
       console.log(err);
-    }
-  };
-
-  // Update profile
-  const handleUpdateProfile = async () => {
-    try {
-      const res = await API.put('/profile', { name, password }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUserData(prev => ({ ...prev, name }));
-      setPassword('');
-      alert('Profile updated!');
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // Delete profile
-  const handleDeleteProfile = async () => {
-    if (!window.confirm('Are you sure you want to delete your account?')) return;
-    try {
-      await API.delete(`/profile`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert('Profile deleted!');
-      onLogout();
-    } catch (err) {
-      console.log(err);
+      alert('Error uploading avatar');
     }
   };
 
@@ -82,12 +57,10 @@ export default function Profile({ token, onLogout }) {
         style={styles.avatar}
       />
       <input type="file" onChange={handleAvatarUpload} />
-      <p>
-        <strong>Email:</strong> {userData.email}
-      </p>
-      <p>
-        <strong>Role:</strong> {userData.role}
-      </p>
+
+      <p><strong>Email:</strong> {userData.email}</p>
+      <p><strong>Role:</strong> {userData.role}</p>
+
       <input
         style={styles.input}
         placeholder="Name"
@@ -101,12 +74,26 @@ export default function Profile({ token, onLogout }) {
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
-      <button style={styles.button} onClick={handleUpdateProfile}>
-        Update Profile
-      </button>
-      <button style={styles.deleteBtn} onClick={handleDeleteProfile}>
-        Delete Profile
-      </button>
+      <button style={styles.button} onClick={async () => {
+        try {
+          await API.put('/profile', { name, password }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUserData(prev => ({ ...prev, name }));
+          setPassword('');
+          alert('Profile updated!');
+        } catch (err) { console.log(err); }
+      }}>Update Profile</button>
+
+      <button style={styles.deleteBtn} onClick={async () => {
+        if (!window.confirm('Are you sure to delete your account?')) return;
+        try {
+          await API.delete('/profile', { headers: { Authorization: `Bearer ${token}` } });
+          alert('Profile deleted!');
+          onLogout();
+        } catch (err) { console.log(err); }
+      }}>Delete Profile</button>
+
       <button style={styles.logoutBtn} onClick={onLogout}>Logout</button>
     </div>
   );
