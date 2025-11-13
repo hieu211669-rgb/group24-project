@@ -54,7 +54,6 @@ try {
 // Đăng xuất (phía client sẽ xóa token)
 exports.logout = (req, res) => {
     res.json({ msg: 'Logged out successfully (client should remove token)' });
-res.json({ msg: 'Logged out successfully (client should remove token)' });
 };
 
 // Gửi email reset password
