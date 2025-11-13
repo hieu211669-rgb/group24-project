@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../api';
@@ -14,22 +13,19 @@ export default function Login() {
     e.preventDefault();
     setMsg('');
     setLoading(true);
+
     try {
       const res = await API.post('/auth/login', { email, password });
-      const token = res.data.token;
-      localStorage.setItem('token', token);
+      const { accessToken, refreshToken, user } = res.data;
 
-      // Lấy profile từ token
-      const profileRes = await API.get('/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const role = profileRes.data.role;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
 
-      if (role === 'admin') navigate('/admin');
+      // Redirect theo role
+      if (user.role === 'admin') navigate('/admin');
       else navigate('/profile');
-
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setMsg(err.response?.data?.msg || 'Login failed');
     } finally {
       setLoading(false);
@@ -47,7 +43,7 @@ export default function Login() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
             style={styles.input}
           />
@@ -55,7 +51,7 @@ export default function Login() {
             type="password"
             placeholder="Mật khẩu"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
             style={styles.input}
           />
@@ -75,42 +71,15 @@ export default function Login() {
   );
 }
 
+// --- styles giữ nguyên như bạn đã viết ---
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: 'linear-gradient(135deg, #74ABE2, #5563DE)',
-  },
-  card: {
-    width: '350px',
-    background: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-    padding: '30px 25px',
-    textAlign: 'center',
-  },
+  container: { minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #74ABE2, #5563DE)' },
+  card: { width: '350px', background: '#fff', borderRadius: '12px', boxShadow: '0 6px 20px rgba(0,0,0,0.1)', padding: '30px 25px', textAlign: 'center' },
   title: { fontSize: '22px', marginBottom: '8px', color: '#333' },
   subtitle: { fontSize: '14px', marginBottom: '20px', color: '#666' },
   form: { display: 'flex', flexDirection: 'column', gap: '12px' },
-  input: {
-    padding: '10px',
-    borderRadius: '6px',
-    border: '1px solid #ccc',
-    fontSize: '14px',
-    outline: 'none',
-  },
-  button: {
-    padding: '10px',
-    borderRadius: '6px',
-    border: 'none',
-    backgroundColor: '#5563DE',
-    color: '#fff',
-    fontSize: '15px',
-    cursor: 'pointer',
-    transition: 'background 0.3s',
-  },
+  input: { padding: '10px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '14px', outline: 'none' },
+  button: { padding: '10px', borderRadius: '6px', border: 'none', backgroundColor: '#5563DE', color: '#fff', fontSize: '15px', cursor: 'pointer', transition: 'background 0.3s' },
   msg: { marginTop: '15px', fontSize: '14px', color: 'red' },
   links: { marginTop: '12px', fontSize: '14px', color: '#666' },
   link: { color: '#5563DE', textDecoration: 'none' },

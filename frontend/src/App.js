@@ -7,16 +7,31 @@ import Profile from './components/Profile';
 import UserList from './components/UserList';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import api from "./api"
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   // 🔹 Hàm đăng xuất dùng chung cho cả admin và user
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    window.location.href = '/'; // quay lại trang Login
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) return;
+
+      await api.post('/auth/logout', { refreshToken });
+
+      // Xóa token ở client
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
+      // Redirect về login
+      window.location.href = '/login';
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.msg || 'Logout failed');
+    }
   };
+
 
   useEffect(() => {
     setToken(localStorage.getItem('token'));
@@ -27,6 +42,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
         
         {/* 🔹 Truyền token & onLogout vào các trang có xác thực */}
         <Route path="/profile" element={<Profile token={token} onLogout={handleLogout} />} />
