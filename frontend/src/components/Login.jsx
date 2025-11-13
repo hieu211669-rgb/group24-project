@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../api';
 
-export default function Login() {
+export default function Login({ setToken }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
@@ -16,7 +16,15 @@ export default function Login() {
 
     try {
       const res = await API.post('/auth/login', { email, password });
+<<<<<<< HEAD
       const { accessToken, refreshToken, user } = res.data;
+=======
+      const token = res.data.token;
+
+      // Lưu token vào localStorage + state App
+      localStorage.setItem('token', token);
+      setToken(token);
+>>>>>>> feature/redux-protected
 
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);

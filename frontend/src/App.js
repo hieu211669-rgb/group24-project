@@ -1,5 +1,4 @@
-// src/App.js
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Login from './components/Login';
 import SignUp from './components/Signup';
@@ -9,6 +8,7 @@ import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import api from "./api"
 import AdminLogs from './components/AdminLogs';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -39,6 +39,7 @@ function App() {
   }, []);
 
   return (
+<<<<<<< HEAD
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
@@ -54,6 +55,31 @@ function App() {
         <Route path="/log" element={<AdminLogs />} />
       </Routes>
     </Router>
+=======
+    <Routes>
+      <Route path="/" element={<Login setToken={setToken} />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute token={token}>
+            <Profile token={token} onLogout={handleLogout} />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute token={token}>
+            <UserList token={token} onLogout={handleLogout} />
+          </ProtectedRoute>
+        } 
+      />
+    </Routes>
+>>>>>>> feature/redux-protected
   );
 }
 
