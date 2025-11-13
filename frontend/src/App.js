@@ -39,26 +39,10 @@ function App() {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        
-        {/* 🔹 Truyền token & onLogout vào các trang có xác thực */}
-        <Route path="/profile" element={<Profile token={token} onLogout={handleLogout} />} />
-        <Route path="/admin" element={<UserList token={token} onLogout={handleLogout} />} />
-        
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/log" element={<AdminLogs />} />
-      </Routes>
-    </Router>
-=======
     <Routes>
       <Route path="/" element={<Login setToken={setToken} />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/login" element={<Login  />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
 
@@ -79,7 +63,6 @@ function App() {
         } 
       />
     </Routes>
->>>>>>> feature/redux-protected
   );
 }
 

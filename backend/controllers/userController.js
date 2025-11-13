@@ -35,6 +35,25 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+exports.updateSelf = async (req, res) => {
+  const { name, email } = req.body;
+
+  try {
+    // Dùng req.user.id từ token để tìm user
+    const user = await User.findByIdAndUpdate(
+      req.user.id,       // token decode ra id
+      { name, email },
+      { new: true }      // trả về document mới
+    );
+
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
 // Xóa user (DELETE)
 exports.deleteUser = async (req, res) => {
   try {

@@ -1,7 +1,7 @@
 // routes/user.js
 const express = require('express');
 const router = express.Router();
-const { createUser, updateUser, getUsers, deleteUser } = require('../controllers/userController');
+const { createUser, updateUser, getUsers, deleteUser, updateSelf } = require('../controllers/userController');
 const auth = require('../middleware/authMiddleware');
 const role = require('../middleware/roleMiddleware');
 const Log = require('../models/Log');
@@ -9,7 +9,8 @@ const logActivity = require('../middleware/logActivity');
 // Tạo user
 router.post('/user', auth, logActivity, createUser);
 // Cập nhật user
-router.put('/user/:id', auth, logActivity, updateUser);
+router.put('/user/:id', auth, role('admin'), logActivity, updateUser);
+router.put('/user', auth, logActivity, updateSelf);
 // Lấy danh sách user (admin)
 router.get('/', auth, role('admin'), getUsers);
 // Xóa user

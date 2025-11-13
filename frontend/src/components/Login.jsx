@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../api';
+import API from '../api'; // axios config
 
-export default function Login({ setToken }) {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
@@ -16,22 +16,22 @@ export default function Login({ setToken }) {
 
     try {
       const res = await API.post('/auth/login', { email, password });
-<<<<<<< HEAD
       const { accessToken, refreshToken, user } = res.data;
-=======
-      const token = res.data.token;
 
-      // Lưu token vào localStorage + state App
-      localStorage.setItem('token', token);
-      setToken(token);
->>>>>>> feature/redux-protected
+      if (!accessToken) {
+        setMsg('Login failed: no token returned');
+        return;
+      }
 
+      // Lưu token cho ProtectedRoute
+      localStorage.setItem('token', accessToken);
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
       // Redirect theo role
       if (user.role === 'admin') navigate('/admin');
       else navigate('/profile');
+
     } catch (err) {
       console.error(err);
       setMsg(err.response?.data?.msg || 'Login failed');
@@ -79,10 +79,22 @@ export default function Login({ setToken }) {
   );
 }
 
-// --- styles giữ nguyên như bạn đã viết ---
 const styles = {
-  container: { minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'linear-gradient(135deg, #74ABE2, #5563DE)' },
-  card: { width: '350px', background: '#fff', borderRadius: '12px', boxShadow: '0 6px 20px rgba(0,0,0,0.1)', padding: '30px 25px', textAlign: 'center' },
+  container: {
+    minHeight: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    background: 'linear-gradient(135deg, #74ABE2, #5563DE)'
+  },
+  card: {
+    width: '350px',
+    background: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+    padding: '30px 25px',
+    textAlign: 'center'
+  },
   title: { fontSize: '22px', marginBottom: '8px', color: '#333' },
   subtitle: { fontSize: '14px', marginBottom: '20px', color: '#666' },
   form: { display: 'flex', flexDirection: 'column', gap: '12px' },
