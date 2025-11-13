@@ -1,36 +1,27 @@
 // src/api/axios.js
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+// Tạo axios instance mặc định
+const API = axios.create({
+  baseURL: 'http://localhost:3000/api', // đổi theo server backend
 });
 
-api.interceptors.request.use(async (config) => {
-  let token = localStorage.getItem('accessToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+// Tự động gắn token cho mọi request
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem('token');
+  if (token) req.headers.Authorization = `Bearer ${token}`;
+  return req;
 });
 
-api.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Khi token hết hạn => refresh
-    if (error.response?.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      const refreshToken = localStorage.getItem('refreshToken');
-      const res = await axios.post('http://localhost:3000/api/auth/refresh', { refreshToken });
-
-      if (res.status === 200) {
-        localStorage.setItem('accessToken', res.data.accessToken);
-        api.defaults.headers.Authorization = `Bearer ${res.data.accessToken}`;
-        return api(originalRequest);
-      }
-    }
-    return Promise.reject(error);
+// 🧩 API riêng: Lấy logs (chỉ admin mới xem được)
+export const getLogs = async () => {
+  try {
+    const res = await API.get('/logs'); // ✅ dùng instance API
+    return res.data;
+  } catch (err) {
+    console.error('Fetch logs error:', err.response?.data || err.message);
+    throw err;
   }
-);
+};
 
-export default api;
+export default API;
