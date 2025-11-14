@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../api'; // axios config
 
-export default function Login() {
+export default function Login({ setToken }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
@@ -24,9 +24,10 @@ export default function Login() {
       }
 
       // Lưu token cho ProtectedRoute
-      localStorage.setItem('token', accessToken);
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
+
+      setToken(accessToken);
 
       // Redirect theo role
       if (user.role === 'admin') navigate('/admin');
