@@ -17,17 +17,29 @@ exports.getProfile = async (req, res) => {
 // Cập nhật profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, password } = req.body;
-    const updateData = {};
-    if (name) updateData.name = name;
-    if (password) updateData.password = await bcrypt.hash(password, 10);
+    const { name, email, password } = req.body;
 
-    const user = await User.findByIdAndUpdate(req.user.id, updateData, { new: true });
+    const updateData = {};
+
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
+
     res.json({ msg: 'Profile updated', user });
   } catch (err) {
+    // Xử lý lỗi email trùng
+    if (err.code === 11000) {
+      return res.status(400).json({ msg: 'Email already exists' });
+    }
     res.status(500).json({ msg: err.message });
   }
 };
+
 
 // Xóa profile
 exports.deleteProfile = async (req, res) => {
